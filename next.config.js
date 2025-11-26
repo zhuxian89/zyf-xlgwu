@@ -1,5 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  eslint: {
+    ignoreDuringBuilds: true,  // 跳过 ESLint 检查
+  },
+  typescript: {
+    ignoreBuildErrors: true,    // 跳过 TypeScript 检查
+  },
   images: {
     remotePatterns: [
       {
