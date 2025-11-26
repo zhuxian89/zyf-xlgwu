@@ -202,7 +202,9 @@ export default function GameDetail({ params }: { params: { game: GameKey } }) {
     if (sessionState === "playing" && game === "tetris") {
       const speed = difficulty === "easy" ? 800 : 400;
       loopRef.current = setInterval(stepTetris, speed);
-      return () => loopRef.current && clearInterval(loopRef.current);
+      return () => {
+        if (loopRef.current) clearInterval(loopRef.current);
+      };
     }
     if (loopRef.current) clearInterval(loopRef.current);
   }, [sessionState, game, piece, board, difficulty]);
@@ -211,7 +213,9 @@ export default function GameDetail({ params }: { params: { game: GameKey } }) {
     if (sessionState === "playing" && game === "snake") {
       const speed = difficulty === "easy" ? 350 : 150;
       loopRef.current = setInterval(stepSnake, speed);
-      return () => loopRef.current && clearInterval(loopRef.current);
+      return () => {
+        if (loopRef.current) clearInterval(loopRef.current);
+      };
     }
     if (loopRef.current) clearInterval(loopRef.current);
   }, [sessionState, game, direction, snake, food, difficulty]);
