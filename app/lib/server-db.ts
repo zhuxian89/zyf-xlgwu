@@ -99,30 +99,42 @@ function initDB() {
     )
   `);
 
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS cinema_unlocks (
+      user_id INTEGER,
+      anime_id TEXT,
+      unlocked_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (user_id, anime_id),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+  `);
+
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS reading_progress (
+      user_id INTEGER,
+      book_id TEXT,
+      chapter_id TEXT,
+      completed_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (user_id, book_id, chapter_id),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+  `);
+
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS app_settings (
+      key TEXT PRIMARY KEY,
+      value TEXT
+    )
+  `);
+
+  // Initialize default settings
+  database.prepare(`
+    INSERT OR IGNORE INTO app_settings (key, value) VALUES ('cinema_ticket_price', '50')
+  `).run();
+
   const userCount = database.prepare('SELECT COUNT(*) as count FROM users').get() as { count: number };
   if (userCount.count === 0) {
     database.prepare('INSERT INTO users (username, password, coins) VALUES (?, ?, ?)').run('test', '123456', 1000);
-  }
-
-  // 初始化游戏体力与分数表（单用户示例）
-  database.prepare(`
-    INSERT OR IGNORE INTO game_stats (user_id, energy, max_energy, daily_limit_seconds)
-    VALUES (1, 5, 5, 1800)
-  `).run();
-
-  const gameKeys = ['whac', 'memory', 'rhythm', 'tetris', 'snake', 'puzzle'];
-  const upsertGameScore = database.prepare(`
-    INSERT INTO game_scores (user_id, game, best_score, last_score)
-    VALUES (@user_id, @game, 0, 0)
-    ON CONFLICT(user_id, game) DO UPDATE SET user_id = user_id
-  `);
-  for (const game of gameKeys) {
-    upsertGameScore.run({ user_id: 1, game });
-  }
-
-  const fishCount = database.prepare('SELECT COUNT(*) as count FROM fish').get() as { count: number };
-  if (fishCount.count === 0) {
-    // 空的，将由下面的 upsert 填充
   }
 
   // 使用从HelloDive网站抓取的真实鱼类数据（71种）
@@ -210,16 +222,16 @@ function initDB() {
   ];
 
   const upsertFish = database.prepare(`
-    INSERT INTO fish (name, name_en, stars, sell_price, image_url, emoji, description)
-    VALUES (@name, @name_en, @stars, @sell_price, @image, @emoji, @desc)
+    INSERT INTO fish(name, name_en, stars, sell_price, image_url, emoji, description)
+    VALUES(@name, @name_en, @stars, @sell_price, @image, @emoji, @desc)
     ON CONFLICT(name) DO UPDATE SET
       name_en = @name_en,
-      stars = @stars,
-      sell_price = @sell_price,
-      image_url = @image,
-      emoji = @emoji,
-      description = @desc
-  `);
+    stars = @stars,
+    sell_price = @sell_price,
+    image_url = @image,
+    emoji = @emoji,
+    description = @desc
+      `);
 
   const updateFishTx = database.transaction((fishes) => {
     for (const fish of fishes) upsertFish.run(fish);
