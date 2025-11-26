@@ -69,6 +69,9 @@ function getLeaderboards(db: any) {
     whac: [],
     memory: [],
     rhythm: [],
+    tetris: [],
+    snake: [],
+    puzzle: [],
   };
 
   for (const game of GAME_KEYS) {
@@ -102,6 +105,9 @@ export async function GET() {
       whac: { best_score: 0, last_score: 0, last_played: null },
       memory: { best_score: 0, last_score: 0, last_played: null },
       rhythm: { best_score: 0, last_score: 0, last_played: null },
+      tetris: { best_score: 0, last_score: 0, last_played: null },
+      snake: { best_score: 0, last_score: 0, last_played: null },
+      puzzle: { best_score: 0, last_score: 0, last_played: null },
     };
 
     for (const row of myScores) {
