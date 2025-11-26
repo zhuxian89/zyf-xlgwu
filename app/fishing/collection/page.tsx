@@ -263,7 +263,7 @@ export default function FishCollectionPage() {
                             src={selectedImage}
                             alt="Fish"
                             className="w-[800px] h-[800px] object-contain drop-shadow-2xl"
-                            onClick={(e) => e.stopPropagation()}
+                            onClick={(e: React.MouseEvent) => e.stopPropagation()}
                         />
                     </motion.div>
                 )}
