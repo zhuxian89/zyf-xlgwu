@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Coins, GraduationCap, Fish, Clapperboard, Shovel, Gamepad2 } from "lucide-react";
 import { getUserCoins } from "./lib/db";
-import Image from "next/image";
 
 export default function Home() {
     const { coins, setCoins } = useGameStore();
@@ -53,23 +52,23 @@ export default function Home() {
                 initial={{ y: -100, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ type: "spring", bounce: 0.5 }}
-                className="absolute top-6 left-6 z-50"
+                className="absolute top-4 sm:top-6 left-4 sm:left-6 z-50"
             >
-                <div className="glass rounded-3xl p-5 pr-8 shadow-2xl border-4 border-white flex items-center gap-4">
+                <div className="glass rounded-2xl sm:rounded-3xl p-3 sm:p-5 pr-6 sm:pr-8 shadow-2xl border-2 sm:border-4 border-white flex items-center gap-2 sm:gap-4">
                     <motion.div
                         animate={{ rotate: [0, 10, -10, 0] }}
                         transition={{ duration: 2, repeat: Infinity }}
-                        className="bg-gradient-to-br from-yellow-300 to-yellow-500 p-3 rounded-full shadow-lg"
+                        className="bg-gradient-to-br from-yellow-300 to-yellow-500 p-2 sm:p-3 rounded-full shadow-lg"
                     >
-                        <Coins className="w-10 h-10 text-white drop-shadow-md" />
+                        <Coins className="w-6 h-6 sm:w-10 sm:h-10 text-white drop-shadow-md" />
                     </motion.div>
                     <div>
-                        <p className="text-sm font-bold text-gray-600 uppercase tracking-wide">我的金币</p>
+                        <p className="text-xs sm:text-sm font-bold text-gray-600 uppercase tracking-wide">我的金币</p>
                         <motion.p
                             key={coins}
                             initial={{ scale: 1.5, color: "#fbbf24" }}
                             animate={{ scale: 1, color: "#d97706" }}
-                            className="text-5xl font-black"
+                            className="text-3xl sm:text-5xl font-black"
                         >
                             {coins}
                         </motion.p>
@@ -82,11 +81,11 @@ export default function Home() {
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.2, type: "spring", stiffness: 100 }}
-                className="absolute top-6 left-1/2 -translate-x-1/2 z-40"
+                className="absolute top-4 sm:top-6 right-4 sm:right-6 z-40"
             >
-                <div className="relative">
-                    <h1 className="text-7xl font-black text-white text-stroke drop-shadow-2xl font-[var(--font-fredoka)]">
-                        🌟 我的学习冒险 🌟
+                <div className="relative text-center">
+                    <h1 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-black text-white text-stroke drop-shadow-2xl font-[var(--font-fredoka)] whitespace-nowrap">
+                        🌟 我的学校冒险 🌟
                     </h1>
                 </div>
             </motion.div>
@@ -111,30 +110,30 @@ export default function Home() {
                             <motion.div
                                 whileHover={{ scale: 1.15, rotate: 5 }}
                                 whileTap={{ scale: 0.9 }}
-                                className="cursor-pointer flex flex-col items-center gap-3 group"
+                                className="cursor-pointer flex flex-col items-center gap-2 sm:gap-3 group"
                             >
                                 {/* 3D 建筑卡片 */}
                                 <div className="relative">
                                     <motion.div
                                         animate={{ y: [0, -10, 0] }}
                                         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                                        className={`bg-gradient-to-br ${building.color} w-36 h-36 rounded-3xl 
-                              shadow-[0_15px_0_rgba(0,0,0,0.2)] 
-                              group-hover:shadow-[0_20px_0_rgba(0,0,0,0.25)]
-                              border-4 border-white 
+                                        className={`bg-gradient-to-br ${building.color} w-24 h-24 sm:w-36 sm:h-36 rounded-2xl sm:rounded-3xl 
+                              shadow-[0_10px_0_rgba(0,0,0,0.2)] sm:shadow-[0_15px_0_rgba(0,0,0,0.2)] 
+                              group-hover:shadow-[0_15px_0_rgba(0,0,0,0.25)] sm:group-hover:shadow-[0_20px_0_rgba(0,0,0,0.25)]
+                              border-2 sm:border-4 border-white 
                               flex items-center justify-center
                               transition-all duration-300`}
                                     >
-                                        <building.icon className="w-20 h-20 text-white drop-shadow-lg" strokeWidth={2.5} />
+                                        <building.icon className="w-12 h-12 sm:w-20 sm:h-20 text-white drop-shadow-lg" strokeWidth={2.5} />
                                     </motion.div>
                                 </div>
 
                                 {/* 名称标签 */}
                                 <motion.div
                                     whileHover={{ scale: 1.1 }}
-                                    className="glass px-6 py-2 rounded-full shadow-xl border-2 border-white"
+                                    className="glass px-4 py-1 sm:px-6 sm:py-2 rounded-full shadow-xl border border-white sm:border-2"
                                 >
-                                    <span className="text-xl font-black text-gray-800 font-[var(--font-fredoka)]">
+                                    <span className="text-base sm:text-xl font-black text-gray-800 font-[var(--font-fredoka)]">
                                         {building.name}
                                     </span>
                                 </motion.div>
