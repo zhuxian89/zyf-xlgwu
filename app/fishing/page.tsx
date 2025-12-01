@@ -2,8 +2,9 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, BookOpen, Anchor, Info } from "lucide-react";
+import { ArrowLeft, BookOpen, Anchor, Info, Volume2, VolumeX } from "lucide-react";
 import { useGameStore } from "../hooks/useGameStore";
+import { useGameAudio } from "../hooks/useGameAudio";
 import Link from "next/link";
 import Toast, { useToast } from "../components/Toast";
 
@@ -14,6 +15,8 @@ export default function FishingPage() {
     const [gameState, setGameState] = useState<'idle' | 'casting' | 'waiting' | 'biting' | 'fighting' | 'caught' | 'missed'>('idle');
     const [lastCatch, setLastCatch] = useState<any>(null);
     const { toasts, showToast, removeToast } = useToast();
+    const audio = useGameAudio();
+    const [isMuted, setIsMuted] = useState(false);
 
     // Fight Mechanics State
     const [tension, setTension] = useState(0);
@@ -30,6 +33,15 @@ export default function FishingPage() {
     useEffect(() => { tensionRef.current = tension; }, [tension]);
     useEffect(() => { isHoldingRef.current = isHolding; }, [isHolding]);
     useEffect(() => { return () => stopGameLoop(); }, []);
+
+    // Start fishing background music on mount, stop on unmount
+    // Temporarily disabled
+    // useEffect(() => {
+    //     audio.startFishingMusic();
+    //     return () => {
+    //         audio.stopFishingMusic();
+    //     };
+    // }, [audio]);
 
     const stopGameLoop = () => {
         if (gameLoopRef.current) {
@@ -55,16 +67,20 @@ export default function FishingPage() {
                 const data = await res.json();
                 setCoins(data.coins);
                 setGameState('casting');
+                audio.playCastSound();
 
                 setTimeout(() => {
                     setGameState('waiting');
+                    audio.playWaterAmbience();
                     const waitTime = Math.random() * 3000 + 2000;
                     setTimeout(() => {
                         setGameState('biting');
+                        audio.playBiteSound();
                         setTimeout(() => {
                             setGameState(prev => {
                                 if (prev === 'biting') {
                                     showToast('鱼跑了...', 'info');
+                                    audio.playMissedSound();
                                     return 'missed';
                                 }
                                 return prev;
@@ -88,6 +104,8 @@ export default function FishingPage() {
         setProgress(25);
         tensionRef.current = 30;
         progressRef.current = 25;
+        audio.playFightSound();
+        audio.startBattleLoop();
 
         // Delay 1 second before starting the game loop to give player time to prepare
         setTimeout(() => {
@@ -128,12 +146,15 @@ export default function FishingPage() {
 
             if (newProgress >= 100) {
                 stopGameLoop();
+                audio.stopBattleLoop();
                 handleCatch();
                 return;
             } else if (newProgress <= 0) {
                 stopGameLoop();
+                audio.stopBattleLoop();
                 setGameState('missed');
                 showToast('鱼跑了！', 'error');
+                audio.playMissedSound();
                 return;
             }
 
@@ -150,6 +171,7 @@ export default function FishingPage() {
             if (data.fish) {
                 setLastCatch(data.fish);
                 setGameState('caught');
+                audio.playCatchSuccessSound();
                 showToast(`钓到了 ${data.fish.name}！`, 'success');
             }
         } catch (error) {
@@ -169,6 +191,7 @@ export default function FishingPage() {
             if (res.ok) {
                 const data = await res.json();
                 setCoins(data.coins);
+                audio.playSellSound();
                 showToast(`出售成功！获得 ${fish.sell_price} 金币`, 'success');
                 setLastCatch(null);
                 setGameState('idle');
@@ -181,6 +204,7 @@ export default function FishingPage() {
     };
 
     const keepFish = () => {
+        audio.playKeepSound();
         showToast('已放入图鉴', 'success');
         setLastCatch(null);
         setGameState('idle');
@@ -249,6 +273,19 @@ export default function FishingPage() {
                     </h1>
                 </div>
                 <div className="flex items-center gap-4 pointer-events-auto">
+                    <button
+                        onClick={() => {
+                            setIsMuted(!isMuted);
+                            audio.setMuted(!isMuted);
+                        }}
+                        className="p-3 bg-white/20 hover:bg-white/30 rounded-full shadow-md transition-colors border border-white/30"
+                    >
+                        {isMuted ? (
+                            <VolumeX className="w-5 h-5 text-white" />
+                        ) : (
+                            <Volume2 className="w-5 h-5 text-white" />
+                        )}
+                    </button>
                     <div className="bg-yellow-400/90 px-6 py-2 rounded-full border-2 border-yellow-200 flex items-center gap-2 shadow-md">
                         <span className="text-2xl">💰</span>
                         <span className="text-xl font-bold text-yellow-900">{coins}</span>

@@ -22,9 +22,12 @@ import {
   ChevronRight,
   ChevronDown,
   ChevronUp,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import type { ElementType } from "react";
 import { useGameStore } from "../../hooks/useGameStore";
+import { useGameRoomAudio } from "../../hooks/useGameRoomAudio";
 import { getUserCoins } from "../../lib/db";
 import Toast, { useToast } from "../../components/Toast";
 
@@ -86,6 +89,8 @@ export default function GameDetail({ params }: { params: { game: GameKey } }) {
 
   const { coins, setCoins } = useGameStore();
   const { toasts, showToast, removeToast } = useToast();
+  const audio = useGameRoomAudio();
+  const [isMuted, setIsMuted] = useState(false);
 
   const [mounted, setMounted] = useState(false);
   const [loadingStats, setLoadingStats] = useState(true);
@@ -346,6 +351,10 @@ export default function GameDetail({ params }: { params: { game: GameKey } }) {
       body: JSON.stringify({ action: "play" }),
     }).catch(() => { });
 
+    // Play start sound and background music
+    audio.playGameStart();
+    audio.startBackgroundMusic(game);
+
     setSessionState("playing");
   };
 
@@ -354,6 +363,11 @@ export default function GameDetail({ params }: { params: { game: GameKey } }) {
     if (finishingRef.current) return;
     finishingRef.current = true;
     setSessionState("finishing");
+
+    // Stop background music and play game over sound
+    audio.stopBackgroundMusic();
+    audio.playGameOver();
+
     const durationSec = Math.max(1, gameDuration - timeLeft);
     const finalScore = forceScore ?? scoreRef.current;
 
@@ -406,8 +420,10 @@ export default function GameDetail({ params }: { params: { game: GameKey } }) {
     if (idx === activeHole) {
       setScore((s) => s + 8);
       setActiveHole(null);
+      audio.playWhacHitSuccess();
     } else {
       setScore((s) => Math.max(0, s - 3));
+      audio.playWhacMiss();
     }
   };
 
@@ -415,6 +431,8 @@ export default function GameDetail({ params }: { params: { game: GameKey } }) {
     if (sessionState !== "playing" || game !== "memory") return;
     if (card.matched || card.flipped) return;
     if (flippedIds.length === 2) return;
+
+    audio.playCardFlip();
 
     const newCards = memoryCards.map((c) => (c.id === card.id ? { ...c, flipped: true } : c));
     const newFlipped = [...flippedIds, card.id];
@@ -432,7 +450,11 @@ export default function GameDetail({ params }: { params: { game: GameKey } }) {
           );
           setScore((s) => s + 12);
           setFlippedIds([]);
-          if (newCards.filter((c) => ![aId, bId].includes(c.id)).every((c) => c.matched)) finishGame();
+          audio.playCardMatch();
+          if (newCards.filter((c) => ![aId, bId].includes(c.id)).every((c) => c.matched)) {
+            audio.playMemoryComplete();
+            finishGame();
+          }
         }, 200);
       } else {
         setTimeout(() => {
@@ -441,6 +463,7 @@ export default function GameDetail({ params }: { params: { game: GameKey } }) {
           );
           setScore((s) => Math.max(0, s - 4));
           setFlippedIds([]);
+          audio.playCardMismatch();
         }, 500);
       }
     }
@@ -464,7 +487,10 @@ export default function GameDetail({ params }: { params: { game: GameKey } }) {
       stepTetris();
       return;
     }
-    if (canPlace(piece, dir, 0)) setPiece({ ...piece, x: piece.x + dir });
+    if (canPlace(piece, dir, 0)) {
+      setPiece({ ...piece, x: piece.x + dir });
+      audio.playTetrisMove();
+    }
   };
 
   const rotateTetris = () => {
@@ -479,6 +505,7 @@ export default function GameDetail({ params }: { params: { game: GameKey } }) {
 
     if (canPlace(piece, 0, 0, normalizedShape)) {
       setActiveShape(normalizedShape);
+      audio.playTetrisRotate();
     }
   };
 
@@ -487,6 +514,8 @@ export default function GameDetail({ params }: { params: { game: GameKey } }) {
     if (canPlace(piece, 0, 1)) {
       setPiece({ ...piece, y: piece.y + 1 });
     } else {
+      audio.playTetrisLand();
+
       const nextBoard = board.map((r) => [...r]);
       for (const [bx, by] of activeShape) {
         const x = piece.x + bx;
@@ -500,7 +529,10 @@ export default function GameDetail({ params }: { params: { game: GameKey } }) {
       const remaining = nextBoard.filter((r) => r.some((c) => c === 0));
       const cleared = 20 - remaining.length;
       while (remaining.length < 20) remaining.unshift(Array(10).fill(0));
-      if (cleared > 0) setScore((s) => s + cleared * 50);
+      if (cleared > 0) {
+        setScore((s) => s + cleared * 50);
+        audio.playTetrisClear(cleared);
+      }
       setBoard(remaining);
       setPiece({ x: 3, y: 0 });
       setActiveShape(TETRIS_SHAPES[Math.floor(Math.random() * TETRIS_SHAPES.length)]);
@@ -516,6 +548,7 @@ export default function GameDetail({ params }: { params: { game: GameKey } }) {
     const hitWall = next.x < 0 || next.x >= boardSize || next.y < 0 || next.y >= boardSize;
     const hitBody = snake.some((s) => s.x === next.x && s.y === next.y);
     if (hitWall || hitBody) {
+      audio.playSnakeDie();
       finishGame(scoreRef.current);
       return;
     }
@@ -523,6 +556,7 @@ export default function GameDetail({ params }: { params: { game: GameKey } }) {
     if (next.x === food.x && next.y === food.y) {
       setScore((s) => s + 5);
       setFood(randomFood(newSnake, boardSize));
+      audio.playSnakeEat();
     } else {
       newSnake.pop();
     }
@@ -566,10 +600,12 @@ export default function GameDetail({ params }: { params: { game: GameKey } }) {
 
     setTiles(newTiles);
     setMoves((m) => m + 1);
+    audio.playPuzzleMove();
 
     if (isSolved(newTiles)) {
       const finalScore = Math.max(50, 200 - moves * 2);
       setScore(finalScore);
+      audio.playPuzzleComplete();
       finishGame(finalScore);
     }
   };
@@ -618,11 +654,29 @@ export default function GameDetail({ params }: { params: { game: GameKey } }) {
 
       {/* 顶部 HUD - 极简版 */}
       <div className="relative z-20 px-4 sm:px-6 pt-4 shrink-0 flex items-center justify-between">
-        <Link href="/gameroom">
-          <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="glass rounded-full p-2 sm:p-3 shadow-lg border-2 border-white/70 bg-white/40 backdrop-blur-md">
-            <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+        <div className="flex items-center gap-2">
+          <Link href="/gameroom">
+            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="glass rounded-full p-2 sm:p-3 shadow-lg border-2 border-white/70 bg-white/40 backdrop-blur-md">
+              <ArrowLeft className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+            </motion.button>
+          </Link>
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              setIsMuted(!isMuted);
+              audio.setMuted(!isMuted);
+            }}
+            className="glass rounded-full p-2 sm:p-3 shadow-lg border-2 border-white/70 bg-white/40 backdrop-blur-md"
+          >
+            {isMuted ? (
+              <VolumeX className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+            ) : (
+              <Volume2 className="w-5 h-5 sm:w-6 sm:h-6 text-gray-700" />
+            )}
           </motion.button>
-        </Link>
+        </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
           <div className="glass rounded-full px-3 py-1.5 sm:px-4 sm:py-2 shadow-lg border-2 border-white/70 flex items-center gap-2 bg-white/40 backdrop-blur-md">
@@ -1007,9 +1061,9 @@ function renderSnake(snake: Pos[], food: Pos, setDir: React.Dispatch<React.SetSt
   const isDarkCell = (x: number, y: number) => (x + y) % 2 === 1;
 
   return (
-    <div className="flex flex-col md:flex-row items-center justify-center gap-8 h-full w-full max-w-6xl mx-auto py-2">
+    <div className="flex flex-col lg:flex-row items-center justify-center gap-4 lg:gap-8 h-full w-full max-w-6xl mx-auto py-2 px-2">
       {/* Game Board - Classic Checkerboard Grass */}
-      <div className="relative h-[50vh] md:h-[75vh] aspect-square bg-[#aad751] rounded-xl border-[8px] border-[#8ab644] shadow-2xl p-1 ring-4 ring-black/10 select-none overflow-hidden shrink-0">
+      <div className="relative w-full max-w-[500px] aspect-square bg-[#aad751] rounded-xl border-[8px] border-[#8ab644] shadow-2xl p-1 ring-4 ring-black/10 select-none overflow-hidden shrink-0">
 
         <div
           className="grid w-full h-full"
@@ -1060,8 +1114,8 @@ function renderSnake(snake: Pos[], food: Pos, setDir: React.Dispatch<React.SetSt
       </div>
 
       {/* Controls - D-Pad Layout */}
-      <div className="flex flex-col items-center justify-center gap-4 z-20 bg-white/20 p-6 rounded-[2rem] backdrop-blur-md border border-white/30 shadow-xl shrink-0">
-        <div className="grid grid-cols-3 gap-3 sm:gap-4">
+      <div className="flex flex-col items-center justify-center gap-4 z-20 bg-white/20 p-4 sm:p-6 rounded-[2rem] backdrop-blur-md border border-white/30 shadow-xl shrink-0">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
           <div />
           <BigControlBtn onClick={() => setDir((d) => (d.y === 1 ? d : { x: 0, y: -1 }))} icon={<ChevronUp className="w-8 h-8 sm:w-10 sm:h-10" />} color="bg-indigo-500" shadow="shadow-indigo-700" />
           <div />
@@ -1070,7 +1124,7 @@ function renderSnake(snake: Pos[], food: Pos, setDir: React.Dispatch<React.SetSt
           <BigControlBtn onClick={() => setDir((d) => (d.y === -1 ? d : { x: 0, y: 1 }))} icon={<ChevronDown className="w-8 h-8 sm:w-10 sm:h-10" />} color="bg-indigo-500" shadow="shadow-indigo-700" />
           <BigControlBtn onClick={() => setDir((d) => (d.x === -1 ? d : { x: 1, y: 0 }))} icon={<ChevronRight className="w-8 h-8 sm:w-10 sm:h-10" />} color="bg-indigo-500" shadow="shadow-indigo-700" />
         </div>
-        <p className="text-gray-700 font-bold text-sm mt-2 bg-white/50 px-3 py-1 rounded-full">方向键控制移动</p>
+        <p className="text-gray-700 font-bold text-xs sm:text-sm mt-2 bg-white/50 px-3 py-1 rounded-full">方向键控制移动</p>
       </div>
     </div>
   );

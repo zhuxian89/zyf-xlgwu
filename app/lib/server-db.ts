@@ -127,6 +127,33 @@ function initDB() {
     )
   `);
 
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS farm_crops (
+      id TEXT PRIMARY KEY,
+      user_id INTEGER DEFAULT 1,
+      type TEXT NOT NULL,
+      planted_at INTEGER NOT NULL,
+      watered_at INTEGER,
+      growth_time INTEGER NOT NULL,
+      x INTEGER NOT NULL,
+      y INTEGER NOT NULL,
+      status TEXT DEFAULT 'growing',
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+  `);
+
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS farm_animals (
+      id TEXT PRIMARY KEY,
+      user_id INTEGER DEFAULT 1,
+      type TEXT NOT NULL,
+      bought_at INTEGER NOT NULL,
+      production_time INTEGER NOT NULL,
+      last_produced_at INTEGER,
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+  `);
+
   // Initialize default settings
   database.prepare(`
     INSERT OR IGNORE INTO app_settings (key, value) VALUES ('cinema_ticket_price', '50')

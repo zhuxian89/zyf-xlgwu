@@ -6,6 +6,7 @@ import { ArrowLeft, Star, Lock, X, DollarSign } from 'lucide-react';
 import Link from 'next/link';
 import Toast, { useToast } from '../../components/Toast';
 import { useGameStore } from '../../hooks/useGameStore';
+import { useGameAudio } from '../../hooks/useGameAudio';
 
 interface Fish {
     id: number;
@@ -27,6 +28,7 @@ export default function FishCollectionPage() {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const { toasts, showToast, removeToast } = useToast();
     const { coins, setCoins } = useGameStore();
+    const audio = useGameAudio();
 
     useEffect(() => {
         fetchData();
@@ -80,6 +82,7 @@ export default function FishCollectionPage() {
             if (res.ok) {
                 const data = await res.json();
                 setCoins(data.coins);
+                audio.playSellSound();
                 showToast(`出售成功！获得 ${data.sellPrice} 金币`, 'success');
                 // Refresh the collection data
                 await fetchData();

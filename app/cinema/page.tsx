@@ -63,7 +63,7 @@ export default function CinemaHub() {
     };
 
     return (
-        <div className="min-h-screen bg-slate-900 text-white overflow-hidden flex flex-col relative">
+        <div className="min-h-screen bg-slate-900 text-white overflow-y-auto flex flex-col relative">
             <AnimatePresence>
                 {activeToast && (
                     <Toast
