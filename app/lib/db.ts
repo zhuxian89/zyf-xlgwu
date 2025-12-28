@@ -1,6 +1,10 @@
 // 客户端数据库接口（通过 API 调用服务器端 SQLite）
 
+// 检查是否在客户端
+const isClient = typeof window !== 'undefined';
+
 export async function getUserCoins(): Promise<number> {
+  if (!isClient) return 100; // 服务器端返回默认值
   try {
     const res = await fetch('/api/coins');
     const data = await res.json();
@@ -12,6 +16,7 @@ export async function getUserCoins(): Promise<number> {
 }
 
 export async function updateUserCoins(coins: number) {
+  if (!isClient) return; // 服务器端不执行
   try {
     await fetch('/api/coins', {
       method: 'POST',
@@ -24,6 +29,7 @@ export async function updateUserCoins(coins: number) {
 }
 
 export async function getQuestions() {
+  if (!isClient) return []; // 服务器端返回空数组
   try {
     const res = await fetch('/api/questions');
     const data = await res.json();
@@ -35,6 +41,7 @@ export async function getQuestions() {
 }
 
 export async function addQuestion(subject: string, content: string, answer: string, reward: number) {
+  if (!isClient) return;
   try {
     await fetch('/api/questions', {
       method: 'POST',
@@ -47,6 +54,7 @@ export async function addQuestion(subject: string, content: string, answer: stri
 }
 
 export async function getAllFish() {
+  if (!isClient) return [];
   try {
     const res = await fetch('/api/fish');
     const data = await res.json();
@@ -58,6 +66,7 @@ export async function getAllFish() {
 }
 
 export async function catchFish() {
+  if (!isClient) return null;
   try {
     const res = await fetch('/api/fish/catch', {
       method: 'POST',
@@ -71,6 +80,7 @@ export async function catchFish() {
 }
 
 export async function getCatchLog() {
+  if (!isClient) return [];
   try {
     const res = await fetch('/api/fish/catches');
     const data = await res.json();
