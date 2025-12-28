@@ -191,78 +191,51 @@ pm2 startup
 pm2 save
 ```
 
-### 4. Nginx 反向代理（推荐）
+### 4. Caddy 反向代理（推荐，最轻量）
 
-#### 安装 Nginx
+Caddy 比 Nginx 更轻量，配置极简，**自动申请和续期 HTTPS 证书**。
+
+#### 安装 Caddy
 
 ```bash
 # Ubuntu/Debian
-sudo apt install -y nginx
-
-# CentOS/RHEL
-sudo yum install -y nginx
+sudo apt install -y debian-keyring debian-archive-keyring apt-transport-https curl
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | sudo gpg --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg
+curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt' | sudo tee /etc/apt/sources.list.d/caddy-stable.list
+sudo apt update
+sudo apt install caddy
 ```
 
-#### 配置 Nginx
+#### 配置 Caddy
 
-创建配置文件 `/etc/nginx/sites-available/edu-game`：
+编辑 `/etc/caddy/Caddyfile`：
 
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;  # 替换为你的域名或 IP
-
-    location / {
-        proxy_pass http://127.0.0.1:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_cache_bypass $http_upgrade;
-    }
-
-    # 静态文件缓存
-    location /_next/static {
-        proxy_pass http://127.0.0.1:3000;
-        proxy_cache_valid 60m;
-        add_header Cache-Control "public, max-age=31536000, immutable";
-    }
+```
+study.201861.xyz {
+    reverse_proxy localhost:3000
 }
 ```
 
-#### 启用配置
+就这么简单！Caddy 会自动申请 Let's Encrypt 证书。
+
+#### 启动 Caddy
 
 ```bash
-# 创建软链接
-sudo ln -s /etc/nginx/sites-available/edu-game /etc/nginx/sites-enabled/
-
-# 测试配置
-sudo nginx -t
-
-# 重启 Nginx
-sudo systemctl restart nginx
-sudo systemctl enable nginx
+sudo systemctl restart caddy
+sudo systemctl enable caddy
 ```
 
-### 5. 配置 HTTPS（可选）
-
-使用 Let's Encrypt 免费证书：
+#### 验证
 
 ```bash
-# 安装 Certbot
-sudo apt install -y certbot python3-certbot-nginx
+# 查看状态
+sudo systemctl status caddy
 
-# 获取证书并自动配置 Nginx
-sudo certbot --nginx -d your-domain.com
-
-# 自动续期测试
-sudo certbot renew --dry-run
+# 查看日志
+sudo journalctl -u caddy -f
 ```
 
-### 6. 防火墙配置
+### 5. 防火墙配置
 
 ```bash
 # Ubuntu (ufw)
