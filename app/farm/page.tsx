@@ -425,16 +425,18 @@ export default function FarmPage() {
                 </div>
             )}
 
-            {/* Main Content - Side by Side Layout */}
-            <div className="flex-1 flex gap-4 p-4 min-h-0">
-                {/* Farm Grid - Left Side */}
-                <div className="flex-1 bg-[#8B7355] p-4 rounded-2xl shadow-xl border-4 border-[#6B5344] flex flex-col">
+            {/* Main Content - Responsive Layout */}
+            <div className="flex-1 flex flex-col lg:flex-row gap-4 p-4 min-h-0 overflow-auto">
+                {/* Farm Grid */}
+                <div className="flex-1 bg-[#8B7355] p-4 rounded-2xl shadow-xl border-4 border-[#6B5344] flex flex-col min-h-[300px]">
                     <h2 className="text-lg font-black text-white mb-3 flex items-center gap-2 shrink-0">
                         <Sprout className="w-5 h-5" />
                         农田
                     </h2>
-                    <div className="flex-1 grid grid-cols-6 grid-rows-4 gap-2">
+                    {/* 响应式网格：手机3列、平板4列、大屏6列 */}
+                    <div className="flex-1 grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 auto-rows-fr">
                         {Array.from({ length: 24 }, (_, i) => {
+                            // 根据屏幕大小计算坐标（保持数据一致性，始终按6列计算）
                             const x = i % 6;
                             const y = Math.floor(i / 6);
                             const crop = crops.find(c => c.x === x && c.y === y);
@@ -449,7 +451,7 @@ export default function FarmPage() {
                                     key={i}
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className={`rounded-xl flex items-center justify-center cursor-pointer transition-all relative ${crop
+                                    className={`rounded-xl flex items-center justify-center cursor-pointer transition-all relative aspect-square min-h-[60px] ${crop
                                         ? ready
                                             ? 'bg-green-400 shadow-lg shadow-green-500/50'
                                             : crop.watered_at
@@ -510,10 +512,11 @@ export default function FarmPage() {
                     </div>
                 </div>
 
-                {/* Animals Section - Right Side */}
-                <div className="w-72 bg-green-700/20 p-4 rounded-2xl border-2 border-green-600/30 flex flex-col">
+                {/* Animals Section - Responsive */}
+                <div className="lg:w-72 bg-green-700/20 p-4 rounded-2xl border-2 border-green-600/30 flex flex-col min-h-[200px]">
                     <h2 className="text-lg font-black text-green-800 mb-3 shrink-0">🐔 动物栏</h2>
-                    <div className="flex-1 grid grid-cols-2 grid-rows-3 gap-3 min-h-0">
+                    {/* 响应式网格：手机3列、平板4列、大屏2列 */}
+                    <div className="flex-1 grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-2 gap-3 auto-rows-fr">
                         {animals.slice(0, 6).map(animal => {
                             const animalType = ANIMAL_TYPES[animal.type as keyof typeof ANIMAL_TYPES];
                             const canCollect = canCollectProduct(animal);
@@ -523,7 +526,7 @@ export default function FarmPage() {
                                     key={animal.id}
                                     whileHover={{ y: -3 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className={`relative rounded-xl flex flex-col items-center justify-center ${canCollect
+                                    className={`relative rounded-xl flex flex-col items-center justify-center aspect-square min-h-[70px] ${canCollect
                                         ? 'bg-yellow-400 shadow-lg shadow-yellow-500/50'
                                         : 'bg-white'
                                         } border-2 border-green-600 cursor-pointer`}
@@ -550,7 +553,7 @@ export default function FarmPage() {
                             );
                         })}
                         {animals.length === 0 && (
-                            <div className="col-span-2 row-span-3 flex items-center justify-center text-gray-500 text-sm">
+                            <div className="col-span-3 sm:col-span-4 lg:col-span-2 flex items-center justify-center text-gray-500 text-sm py-8">
                                 还没有动物，去商店购买吧！
                             </div>
                         )}
@@ -558,7 +561,7 @@ export default function FarmPage() {
                             Array.from({ length: 6 - animals.length }, (_, i) => (
                                 <div
                                     key={`empty-${i}`}
-                                    className="rounded-xl border-2 border-dashed border-green-400/50 flex items-center justify-center text-green-400/50 text-2xl"
+                                    className="rounded-xl border-2 border-dashed border-green-400/50 flex items-center justify-center text-green-400/50 text-2xl aspect-square min-h-[70px]"
                                 >
                                     +
                                 </div>
