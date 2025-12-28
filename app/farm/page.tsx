@@ -552,7 +552,7 @@ export default function FarmPage() {
                             );
                         })}
                         {animals.length === 0 && (
-                            <div className="col-span-3 sm:col-span-4 lg:col-span-2 flex items-center justify-center text-gray-500 text-sm py-8">
+                            <div className="col-span-3 md:col-span-2 flex items-center justify-center text-gray-500 text-sm py-8">
                                 还没有动物，去商店购买吧！
                             </div>
                         )}
@@ -560,7 +560,7 @@ export default function FarmPage() {
                             Array.from({ length: 6 - animals.length }, (_, i) => (
                                 <div
                                     key={`empty-${i}`}
-                                    className="rounded-xl border-2 border-dashed border-green-400/50 flex items-center justify-center text-green-400/50 text-2xl aspect-square min-h-[70px]"
+                                    className="rounded-xl border-2 border-dashed border-green-400/50 flex items-center justify-center text-green-400/50 text-2xl h-20 md:h-24"
                                 >
                                     +
                                 </div>
