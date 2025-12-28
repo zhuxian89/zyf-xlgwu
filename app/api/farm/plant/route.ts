@@ -3,10 +3,16 @@ import { getDB } from '../../../lib/server-db';
 import { getUserCoins, updateUserCoins } from '../../../lib/db';
 
 const CROP_TYPES = {
-    carrot: { price: 10, growthTime: 30, sellPrice: 25 },
-    tomato: { price: 15, growthTime: 45, sellPrice: 40 },
-    wheat: { price: 20, growthTime: 60, sellPrice: 55 },
-    corn: { price: 30, growthTime: 90, sellPrice: 80 },
+    carrot: { price: 5, growthTime: 20, sellPrice: 15 },
+    tomato: { price: 8, growthTime: 30, sellPrice: 22 },
+    strawberry: { price: 12, growthTime: 40, sellPrice: 35 },
+    corn: { price: 15, growthTime: 50, sellPrice: 42 },
+    wheat: { price: 10, growthTime: 60, sellPrice: 28 },
+    watermelon: { price: 25, growthTime: 90, sellPrice: 70 },
+    grape: { price: 20, growthTime: 80, sellPrice: 55 },
+    pumpkin: { price: 30, growthTime: 100, sellPrice: 85 },
+    eggplant: { price: 10, growthTime: 45, sellPrice: 30 },
+    sunflower: { price: 18, growthTime: 70, sellPrice: 50 },
 };
 
 export async function POST(request: Request) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { CheckCircle, XCircle, AlertCircle, Info } from "lucide-react";
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
@@ -13,11 +13,14 @@ interface ToastProps {
     onClose: () => void;
 }
 
-export default function Toast({ message, type = 'info', duration = 3000, onClose }: ToastProps) {
+export default function Toast({ message, type = 'info', duration = 1500, onClose }: ToastProps) {
+    const onCloseRef = useRef(onClose);
+    onCloseRef.current = onClose;
+
     useEffect(() => {
-        const timer = setTimeout(onClose, duration);
+        const timer = setTimeout(() => onCloseRef.current(), duration);
         return () => clearTimeout(timer);
-    }, [duration, onClose]);
+    }, [duration]);
 
     const icons = {
         success: <CheckCircle className="w-6 h-6" />,

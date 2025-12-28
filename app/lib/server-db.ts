@@ -154,6 +154,30 @@ function initDB() {
     )
   `);
 
+  // Farm inventory - stores harvested crops
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS farm_inventory (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER DEFAULT 1,
+      crop_type TEXT NOT NULL,
+      quantity INTEGER DEFAULT 0,
+      UNIQUE(user_id, crop_type),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+  `);
+
+  // Farm collection - tracks which crops have ever been harvested (for 图鉴)
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS farm_collection (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER DEFAULT 1,
+      crop_type TEXT NOT NULL,
+      first_harvested_at INTEGER NOT NULL,
+      UNIQUE(user_id, crop_type),
+      FOREIGN KEY (user_id) REFERENCES users(id)
+    )
+  `);
+
   // Initialize default settings
   database.prepare(`
     INSERT OR IGNORE INTO app_settings (key, value) VALUES ('cinema_ticket_price', '50')

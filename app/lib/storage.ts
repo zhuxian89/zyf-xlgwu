@@ -62,3 +62,29 @@ export function addQuestion(q: Omit<Question, 'id'>) {
   questions.push(newQ);
   localStorage.setItem('questions', JSON.stringify(questions));
 }
+
+// Farm inventory storage
+export function getFarmInventory(): { [key: string]: number } {
+  if (typeof window === 'undefined') return {};
+  return JSON.parse(localStorage.getItem('farmInventory') || '{}');
+}
+
+export function saveFarmInventory(inventory: { [key: string]: number }) {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem('farmInventory', JSON.stringify(inventory));
+}
+
+// Track which crops have been collected (for collection/图鉴)
+export function getFarmCollection(): string[] {
+  if (typeof window === 'undefined') return [];
+  return JSON.parse(localStorage.getItem('farmCollection') || '[]');
+}
+
+export function addToFarmCollection(cropType: string) {
+  if (typeof window === 'undefined') return;
+  const collection = getFarmCollection();
+  if (!collection.includes(cropType)) {
+    collection.push(cropType);
+    localStorage.setItem('farmCollection', JSON.stringify(collection));
+  }
+}

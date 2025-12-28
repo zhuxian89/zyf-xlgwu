@@ -137,33 +137,28 @@ export const useGameAudio = () => {
         }
     }, []);
 
-    // Farm background music loop - cheerful and upbeat
+    // Farm background music - plays MP3 file
+    const farmAudioRef = useRef<HTMLAudioElement | null>(null);
+
     const startFarmMusic = useCallback(() => {
-        if (farmMusicLoopRef.current) return; // Already running
+        if (isMutedRef.current) return;
 
-        // Cheerful farm melody - countryside theme
-        const playFarmMelody = () => {
-            // Upbeat melody using major scale
-            playTone(523, 0.3, 'sine', 0.12); // C
-            setTimeout(() => playTone(659, 0.3, 'sine', 0.12), 350); // E
-            setTimeout(() => playTone(784, 0.3, 'sine', 0.12), 700); // G
-            setTimeout(() => playTone(659, 0.3, 'sine', 0.12), 1050); // E
-            setTimeout(() => playTone(698, 0.3, 'sine', 0.12), 1400); // F
-            setTimeout(() => playTone(784, 0.3, 'sine', 0.12), 1750); // G
-            setTimeout(() => playTone(880, 0.5, 'sine', 0.12), 2100); // A
-        };
+        // Create audio element if not exists
+        if (!farmAudioRef.current) {
+            farmAudioRef.current = new Audio('/audio/farm-music.mp3');
+            farmAudioRef.current.loop = true;
+            farmAudioRef.current.volume = masterVolumeRef.current * 0.3;
+        }
 
-        // Play initial melody
-        playFarmMelody();
-
-        // Loop every 3.5 seconds
-        farmMusicLoopRef.current = setInterval(playFarmMelody, 3500);
-    }, [playTone]);
+        farmAudioRef.current.play().catch((err) => {
+            console.log('Farm music play failed:', err);
+        });
+    }, []);
 
     const stopFarmMusic = useCallback(() => {
-        if (farmMusicLoopRef.current) {
-            clearInterval(farmMusicLoopRef.current);
-            farmMusicLoopRef.current = null;
+        if (farmAudioRef.current) {
+            farmAudioRef.current.pause();
+            farmAudioRef.current.currentTime = 0;
         }
     }, []);
 

@@ -3,15 +3,21 @@ import { getDB } from '../../../lib/server-db';
 import { getUserCoins, updateUserCoins } from '../../../lib/db';
 
 const CROP_TYPES = {
-    carrot: { sellPrice: 25 },
-    tomato: { sellPrice: 40 },
-    wheat: { sellPrice: 55 },
-    corn: { sellPrice: 80 },
+    carrot: { sellPrice: 15 },
+    tomato: { sellPrice: 22 },
+    strawberry: { sellPrice: 35 },
+    corn: { sellPrice: 42 },
+    wheat: { sellPrice: 28 },
+    watermelon: { sellPrice: 70 },
+    grape: { sellPrice: 55 },
+    pumpkin: { sellPrice: 85 },
+    eggplant: { sellPrice: 30 },
+    sunflower: { sellPrice: 50 },
 };
 
 export async function POST(request: Request) {
     try {
-        const { cropId } = await request.json();
+        const { cropId, toInventory } = await request.json();
 
         const db = getDB();
 
@@ -27,7 +33,7 @@ export async function POST(request: Request) {
         // Check if crop is ready
         const currentTime = Date.now();
         const elapsed = (currentTime - crop.planted_at) / 1000;
-        const waterBonus = crop.watered_at ? 0.3 : 0;
+        const waterBonus = crop.watered_at ? 0.5 : 0; // 50% faster when watered
         const effectiveElapsed = elapsed * (1 + waterBonus);
 
         if (effectiveElapsed < crop.growth_time) {
@@ -44,9 +50,11 @@ export async function POST(request: Request) {
       DELETE FROM farm_crops WHERE id = ?
     `).run(cropId);
 
-        // Add coins
+        // If toInventory is true, don't add coins (will be added when selling from inventory)
         const coins = await getUserCoins();
-        await updateUserCoins(coins + cropConfig.sellPrice);
+        if (!toInventory) {
+            await updateUserCoins(coins + cropConfig.sellPrice);
+        }
 
         const crops = db.prepare(`
       SELECT * FROM farm_crops WHERE (status = 'growing' OR status = 'ready') AND user_id = 1
@@ -54,8 +62,9 @@ export async function POST(request: Request) {
 
         return NextResponse.json({
             crops,
-            coins: coins + cropConfig.sellPrice,
+            coins: toInventory ? coins : coins + cropConfig.sellPrice,
             reward: cropConfig.sellPrice,
+            cropType: crop.type,
         });
     } catch (error) {
         console.error('Harvest crop error:', error);
