@@ -426,17 +426,16 @@ export default function FarmPage() {
             )}
 
             {/* Main Content - Responsive Layout */}
-            <div className="flex-1 flex flex-col lg:flex-row gap-4 p-4 min-h-0 overflow-auto">
+            <div className="flex-1 flex flex-col md:flex-row gap-4 p-4 min-h-0 overflow-auto">
                 {/* Farm Grid */}
-                <div className="flex-1 bg-[#8B7355] p-4 rounded-2xl shadow-xl border-4 border-[#6B5344] flex flex-col min-h-[300px]">
+                <div className="flex-1 bg-[#8B7355] p-4 rounded-2xl shadow-xl border-4 border-[#6B5344] flex flex-col">
                     <h2 className="text-lg font-black text-white mb-3 flex items-center gap-2 shrink-0">
                         <Sprout className="w-5 h-5" />
                         农田
                     </h2>
-                    {/* 响应式网格：手机3列、平板4列、大屏6列 */}
-                    <div className="flex-1 grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-2 auto-rows-fr">
+                    {/* 响应式网格：手机4列、平板4列、大屏6列 */}
+                    <div className="flex-1 grid grid-cols-4 md:grid-cols-4 lg:grid-cols-6 gap-2 content-start">
                         {Array.from({ length: 24 }, (_, i) => {
-                            // 根据屏幕大小计算坐标（保持数据一致性，始终按6列计算）
                             const x = i % 6;
                             const y = Math.floor(i / 6);
                             const crop = crops.find(c => c.x === x && c.y === y);
@@ -451,7 +450,7 @@ export default function FarmPage() {
                                     key={i}
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className={`rounded-xl flex items-center justify-center cursor-pointer transition-all relative aspect-square min-h-[60px] ${crop
+                                    className={`rounded-xl flex items-center justify-center cursor-pointer transition-all relative w-full h-16 sm:h-20 ${crop
                                         ? ready
                                             ? 'bg-green-400 shadow-lg shadow-green-500/50'
                                             : crop.watered_at
@@ -512,11 +511,11 @@ export default function FarmPage() {
                     </div>
                 </div>
 
-                {/* Animals Section - Responsive */}
-                <div className="lg:w-72 bg-green-700/20 p-4 rounded-2xl border-2 border-green-600/30 flex flex-col min-h-[200px]">
+                {/* Animals Section - Separate Area */}
+                <div className="md:w-64 lg:w-72 shrink-0 bg-green-700/20 p-4 rounded-2xl border-2 border-green-600/30 flex flex-col">
                     <h2 className="text-lg font-black text-green-800 mb-3 shrink-0">🐔 动物栏</h2>
-                    {/* 响应式网格：手机3列、平板4列、大屏2列 */}
-                    <div className="flex-1 grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-2 gap-3 auto-rows-fr">
+                    {/* 响应式网格：手机3列、平板/大屏2列 */}
+                    <div className="grid grid-cols-3 md:grid-cols-2 gap-3 content-start">
                         {animals.slice(0, 6).map(animal => {
                             const animalType = ANIMAL_TYPES[animal.type as keyof typeof ANIMAL_TYPES];
                             const canCollect = canCollectProduct(animal);
@@ -526,7 +525,7 @@ export default function FarmPage() {
                                     key={animal.id}
                                     whileHover={{ y: -3 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className={`relative rounded-xl flex flex-col items-center justify-center aspect-square min-h-[70px] ${canCollect
+                                    className={`relative rounded-xl flex flex-col items-center justify-center h-20 md:h-24 ${canCollect
                                         ? 'bg-yellow-400 shadow-lg shadow-yellow-500/50'
                                         : 'bg-white'
                                         } border-2 border-green-600 cursor-pointer`}
