@@ -235,8 +235,8 @@ export const BOOKS: Book[] = [
 export function generateMathProblem(): MathProblem {
     const typeRoll = Math.random();
 
-    if (typeRoll < 0.15) {
-        // 20以内加法
+    if (typeRoll < 0.1) {
+        // 20以内加法 (10%)
         const a = Math.floor(Math.random() * 10) + 1;
         const b = Math.floor(Math.random() * (20 - a)) + 1;
         return {
@@ -246,8 +246,8 @@ export function generateMathProblem(): MathProblem {
             type: 'add',
             difficulty: 'easy'
         };
-    } else if (typeRoll < 0.3) {
-        // 20以内减法
+    } else if (typeRoll < 0.2) {
+        // 20以内减法 (10%)
         const a = Math.floor(Math.random() * 15) + 5;
         const b = Math.floor(Math.random() * a) + 1;
         return {
@@ -257,8 +257,8 @@ export function generateMathProblem(): MathProblem {
             type: 'sub',
             difficulty: 'easy'
         };
-    } else if (typeRoll < 0.5) {
-        // 乘法表 (1-9)
+    } else if (typeRoll < 0.35) {
+        // 乘法表 (15%)
         const a = Math.floor(Math.random() * 9) + 1;
         const b = Math.floor(Math.random() * 9) + 1;
         return {
@@ -268,8 +268,8 @@ export function generateMathProblem(): MathProblem {
             type: 'mul',
             difficulty: 'easy'
         };
-    } else if (typeRoll < 0.65) {
-        // 简单除法
+    } else if (typeRoll < 0.45) {
+        // 简单除法 (10%)
         const b = Math.floor(Math.random() * 9) + 1;
         const ans = Math.floor(Math.random() * 9) + 1;
         const a = b * ans;
@@ -281,7 +281,7 @@ export function generateMathProblem(): MathProblem {
             difficulty: 'easy'
         };
     } else {
-        // 乘除法思维题 (重点加强)
+        // 乘除法思维题 (55% - 大幅提高)
         const templates = [
             // 平均分
             {
@@ -533,9 +533,9 @@ export function generateMathProblems(count: number = 5): MathProblem[] {
     return problems;
 }
 
-// 拼音练习数据 - 重点练习 ing, in, un, ün, en, eng, an, ang 等易混淆韵母
+// 拼音练习数据 - 重点练习易混淆韵母和声母
 const PINYIN_DATA = [
-    // ing vs in 对比
+    // ===== ing vs in 对比 =====
     { word: '星星', correct: 'xīng xīng', wrongs: ['xīn xīn', 'xīn xīng', 'xīng xīn'] },
     { word: '听见', correct: 'tīng jiàn', wrongs: ['tīn jiàn', 'tīng jìan', 'tīn jìan'] },
     { word: '心情', correct: 'xīn qíng', wrongs: ['xīng qíng', 'xīn qín', 'xīng qín'] },
@@ -546,32 +546,92 @@ const PINYIN_DATA = [
     { word: '亲人', correct: 'qīn rén', wrongs: ['qīng rén', 'qīn réng', 'qīng réng'] },
     { word: '冰块', correct: 'bīng kuài', wrongs: ['bīn kuài', 'bīng kuāi', 'bīn kuāi'] },
     { word: '新年', correct: 'xīn nián', wrongs: ['xīng nián', 'xīn niáng', 'xīng niáng'] },
+    { word: '电影', correct: 'diàn yǐng', wrongs: ['diàn yǐn', 'diàng yǐng', 'diàng yǐn'] },
+    { word: '信心', correct: 'xìn xīn', wrongs: ['xìng xīn', 'xìn xīng', 'xìng xīng'] },
+    { word: '经过', correct: 'jīng guò', wrongs: ['jīn guò', 'jīng guō', 'jīn guō'] },
+    { word: '进门', correct: 'jìn mén', wrongs: ['jìng mén', 'jìn méng', 'jìng méng'] },
 
-    // un vs ün 对比
+    // ===== un vs ün 对比 =====
     { word: '春天', correct: 'chūn tiān', wrongs: ['chǖn tiān', 'chūn tiàn', 'chǖn tiàn'] },
     { word: '云朵', correct: 'yún duǒ', wrongs: ['yūn duǒ', 'yún duō', 'yūn duō'] },
     { word: '军人', correct: 'jūn rén', wrongs: ['jǖn rén', 'jūn réng', 'jǖn réng'] },
     { word: '裙子', correct: 'qún zi', wrongs: ['qūn zi', 'qún zǐ', 'qūn zǐ'] },
     { word: '温暖', correct: 'wēn nuǎn', wrongs: ['wūn nuǎn', 'wēn nuàn', 'wūn nuàn'] },
-    { word: '昆虫', correct: 'kūn chóng', wrongs: ['kǖn chóng', 'kūn chóng', 'kǖn chóng'] },
+    { word: '昆虫', correct: 'kūn chóng', wrongs: ['kǖn chóng', 'kūn chōng', 'kǖn chōng'] },
+    { word: '运动', correct: 'yùn dòng', wrongs: ['yǖn dòng', 'yùn dōng', 'yǖn dōng'] },
+    { word: '群众', correct: 'qún zhòng', wrongs: ['qūn zhòng', 'qún zhōng', 'qūn zhōng'] },
 
-    // en vs eng 对比
+    // ===== en vs eng 对比 =====
     { word: '风筝', correct: 'fēng zheng', wrongs: ['fēn zheng', 'fēng zhèng', 'fēn zhèng'] },
     { word: '门口', correct: 'mén kǒu', wrongs: ['méng kǒu', 'mén kōu', 'méng kōu'] },
     { word: '朋友', correct: 'péng you', wrongs: ['pén you', 'péng yǒu', 'pén yǒu'] },
     { word: '认真', correct: 'rèn zhēn', wrongs: ['rèng zhēn', 'rèn zhēng', 'rèng zhēng'] },
     { word: '灯笼', correct: 'dēng long', wrongs: ['dēn long', 'dēng lóng', 'dēn lóng'] },
     { word: '本子', correct: 'běn zi', wrongs: ['běng zi', 'běn zǐ', 'běng zǐ'] },
+    { word: '生病', correct: 'shēng bìng', wrongs: ['shēn bìng', 'shēng bìn', 'shēn bìn'] },
+    { word: '分钟', correct: 'fēn zhōng', wrongs: ['fēng zhōng', 'fēn zhōn', 'fēng zhōn'] },
+    { word: '能力', correct: 'néng lì', wrongs: ['nén lì', 'néng lǐ', 'nén lǐ'] },
+    { word: '很冷', correct: 'hěn lěng', wrongs: ['hěng lěng', 'hěn lěn', 'hěng lěn'] },
 
-    // an vs ang 对比
+    // ===== an vs ang 对比 =====
     { word: '蓝天', correct: 'lán tiān', wrongs: ['láng tiān', 'lán tiàn', 'láng tiàn'] },
     { word: '房间', correct: 'fáng jiān', wrongs: ['fán jiān', 'fáng jiàn', 'fán jiàn'] },
     { word: '班级', correct: 'bān jí', wrongs: ['bāng jí', 'bān jī', 'bāng jī'] },
     { word: '帮忙', correct: 'bāng máng', wrongs: ['bān máng', 'bāng mán', 'bān mán'] },
     { word: '山羊', correct: 'shān yáng', wrongs: ['shāng yáng', 'shān yán', 'shāng yán'] },
     { word: '糖果', correct: 'táng guǒ', wrongs: ['tán guǒ', 'táng guō', 'tán guō'] },
+    { word: '眼光', correct: 'yǎn guāng', wrongs: ['yǎng guāng', 'yǎn guān', 'yǎng guān'] },
+    { word: '当然', correct: 'dāng rán', wrongs: ['dān rán', 'dāng ráng', 'dān ráng'] },
+    { word: '南方', correct: 'nán fāng', wrongs: ['náng fāng', 'nán fān', 'náng fān'] },
+    { word: '长短', correct: 'cháng duǎn', wrongs: ['chán duǎn', 'cháng duǎng', 'chán duǎng'] },
 
-    // 其他易混淆
+    // ===== 前后鼻音 ong =====
+    { word: '红色', correct: 'hóng sè', wrongs: ['hón sè', 'hóng shè', 'hón shè'] },
+    { word: '中国', correct: 'zhōng guó', wrongs: ['zhōn guó', 'zhōng guō', 'zhōn guō'] },
+    { word: '同学', correct: 'tóng xué', wrongs: ['tón xué', 'tóng xuě', 'tón xuě'] },
+    { word: '空气', correct: 'kōng qì', wrongs: ['kōn qì', 'kōng qī', 'kōn qī'] },
+
+    // ===== 平翘舌 z/c/s vs zh/ch/sh =====
+    { word: '知道', correct: 'zhī dào', wrongs: ['zī dào', 'zhī dāo', 'zī dāo'] },
+    { word: '自己', correct: 'zì jǐ', wrongs: ['zhì jǐ', 'zì jī', 'zhì jī'] },
+    { word: '吃饭', correct: 'chī fàn', wrongs: ['cī fàn', 'chī fān', 'cī fān'] },
+    { word: '词语', correct: 'cí yǔ', wrongs: ['chí yǔ', 'cí yū', 'chí yū'] },
+    { word: '时间', correct: 'shí jiān', wrongs: ['sí jiān', 'shí jiàn', 'sí jiàn'] },
+    { word: '四季', correct: 'sì jì', wrongs: ['shì jì', 'sì jī', 'shì jī'] },
+    { word: '上山', correct: 'shàng shān', wrongs: ['sàng shān', 'shàng sān', 'sàng sān'] },
+    { word: '三十', correct: 'sān shí', wrongs: ['shān shí', 'sān sí', 'shān sí'] },
+    { word: '早上', correct: 'zǎo shang', wrongs: ['zhǎo shang', 'zǎo sang', 'zhǎo sang'] },
+    { word: '长城', correct: 'cháng chéng', wrongs: ['cáng chéng', 'cháng céng', 'cáng céng'] },
+
+    // ===== n vs l 对比 =====
+    { word: '男女', correct: 'nán nǚ', wrongs: ['lán nǚ', 'nán lǚ', 'lán lǚ'] },
+    { word: '牛奶', correct: 'niú nǎi', wrongs: ['liú nǎi', 'niú lǎi', 'liú lǎi'] },
+    { word: '蓝色', correct: 'lán sè', wrongs: ['nán sè', 'lán shè', 'nán shè'] },
+    { word: '老年', correct: 'lǎo nián', wrongs: ['nǎo nián', 'lǎo lián', 'nǎo lián'] },
+    { word: '努力', correct: 'nǔ lì', wrongs: ['lǔ lì', 'nǔ nì', 'lǔ nì'] },
+    { word: '脑袋', correct: 'nǎo dai', wrongs: ['lǎo dai', 'nǎo dài', 'lǎo dài'] },
+
+    // ===== 声调易错 =====
+    { word: '妈妈', correct: 'mā ma', wrongs: ['má ma', 'mǎ ma', 'mà ma'] },
+    { word: '爸爸', correct: 'bà ba', wrongs: ['bā ba', 'bá ba', 'bǎ ba'] },
+    { word: '奶奶', correct: 'nǎi nai', wrongs: ['nāi nai', 'nái nai', 'nài nai'] },
+    { word: '爷爷', correct: 'yé ye', wrongs: ['yē ye', 'yě ye', 'yè ye'] },
+    { word: '哥哥', correct: 'gē ge', wrongs: ['gé ge', 'gě ge', 'gè ge'] },
+    { word: '弟弟', correct: 'dì di', wrongs: ['dī di', 'dí di', 'dǐ di'] },
+    { word: '姐姐', correct: 'jiě jie', wrongs: ['jiē jie', 'jié jie', 'jiè jie'] },
+    { word: '妹妹', correct: 'mèi mei', wrongs: ['mēi mei', 'méi mei', 'měi mei'] },
+
+    // ===== 多音字 =====
+    { word: '长大', correct: 'zhǎng dà', wrongs: ['cháng dà', 'zhǎng dā', 'cháng dā'] },
+    { word: '长江', correct: 'cháng jiāng', wrongs: ['zhǎng jiāng', 'cháng jiàng', 'zhǎng jiàng'] },
+    { word: '好人', correct: 'hǎo rén', wrongs: ['hào rén', 'hǎo réng', 'hào réng'] },
+    { word: '爱好', correct: 'ài hào', wrongs: ['ài hǎo', 'āi hào', 'āi hǎo'] },
+    { word: '数学', correct: 'shù xué', wrongs: ['shǔ xué', 'shù xuě', 'shǔ xuě'] },
+    { word: '数数', correct: 'shǔ shù', wrongs: ['shù shù', 'shǔ shǔ', 'shù shǔ'] },
+    { word: '音乐', correct: 'yīn yuè', wrongs: ['yīn lè', 'yīng yuè', 'yīng lè'] },
+    { word: '快乐', correct: 'kuài lè', wrongs: ['kuài yuè', 'kuāi lè', 'kuāi yuè'] },
+
+    // ===== 其他常见易错 =====
     { word: '老师', correct: 'lǎo shī', wrongs: ['lǎo sī', 'láo shī', 'láo sī'] },
     { word: '学校', correct: 'xué xiào', wrongs: ['xuě xiào', 'xué xiāo', 'xuě xiāo'] },
     { word: '作业', correct: 'zuò yè', wrongs: ['zuō yè', 'zuò yě', 'zuō yě'] },
@@ -584,6 +644,10 @@ const PINYIN_DATA = [
     { word: '唱歌', correct: 'chàng gē', wrongs: ['chàn gē', 'chàng gě', 'chàn gě'] },
     { word: '跳舞', correct: 'tiào wǔ', wrongs: ['tiào wū', 'tiāo wǔ', 'tiāo wū'] },
     { word: '睡觉', correct: 'shuì jiào', wrongs: ['shuì jiāo', 'shuī jiào', 'shuī jiāo'] },
+    { word: '起床', correct: 'qǐ chuáng', wrongs: ['qǐ cuáng', 'qī chuáng', 'qī cuáng'] },
+    { word: '洗澡', correct: 'xǐ zǎo', wrongs: ['xǐ zhǎo', 'xī zǎo', 'xī zhǎo'] },
+    { word: '穿衣', correct: 'chuān yī', wrongs: ['cuān yī', 'chuān yì', 'cuān yì'] },
+    { word: '刷牙', correct: 'shuā yá', wrongs: ['suā yá', 'shuā yà', 'suā yà'] },
 ];
 
 // 生成拼音练习题
@@ -759,30 +823,30 @@ const SENTENCE_DATA = [
         wrong: '春天的公园多么安静，多么吵闹！'  // 自相矛盾
     },
 
-    // 7. "……极了" - 错误选项：程度词搭配不当
+    // 7. "……极了" - 错误选项：程度词搭配不当但看起来合理
     {
         pattern: '……极了',
         example: '听到这个消息，他高兴极了。',
         correct: '今天的西瓜甜极了。',
-        wrong: '今天的西瓜方极了。'  // 搭配不当
+        wrong: '今天的西瓜圆极了。'  // "圆"不能用"极了"修饰
     },
     {
         pattern: '……极了',
         example: '听到这个消息，他高兴极了。',
         correct: '公园里的风景美极了。',
-        wrong: '公园里的风景跑极了。'  // 搭配不当
+        wrong: '公园里的风景大极了。'  // "大"不适合修饰风景
     },
     {
         pattern: '……极了',
         example: '听到这个消息，他高兴极了。',
         correct: '这个问题难极了。',
-        wrong: '这个问题桌子极了。'  // 搭配不当
+        wrong: '这个问题多极了。'  // "多"不能用"极了"
     },
     {
         pattern: '……极了',
         example: '听到这个消息，他高兴极了。',
         correct: '妹妹的舞跳得棒极了。',
-        wrong: '妹妹的舞跳得椅子极了。'  // 搭配不当
+        wrong: '妹妹的舞跳得快极了。'  // 舞蹈不是越快越好
     },
 
     // 8. "到底"问句 - 错误选项：疑问语气不完整或用法错误
@@ -842,25 +906,25 @@ const SENTENCE_DATA = [
         pattern: '……越……越……',
         example: '雨越下越大。',
         correct: '飞机越飞越高。',
-        wrong: '飞机越飞越矮。'  // 用词不当（应该是"低"）
+        wrong: '飞机越飞越重。'  // 飞机飞行不会变重
     },
     {
         pattern: '……越……越……',
         example: '雨越下越大。',
         correct: '天气越来越冷了。',
-        wrong: '天气越来越冷热了。'  // 矛盾
+        wrong: '天气越来越冷暖了。'  // 矛盾
     },
     {
         pattern: '……越……越……',
         example: '雨越下越大。',
         correct: '我们离终点越来越近了。',
-        wrong: '我们越走离终点越远了。'  // 逻辑不通（走向终点应该越来越近）
+        wrong: '我们越跑离起点越近了。'  // 逻辑不通
     },
     {
         pattern: '……越……越……',
         example: '雨越下越大。',
         correct: '弟弟越长越高了。',
-        wrong: '弟弟越长越老了。'  // 搭配不当
+        wrong: '弟弟越吃越瘦了。'  // 逻辑矛盾
     },
 
     // 11. "虽然……但是……" - 转折关系
