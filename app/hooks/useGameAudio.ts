@@ -139,9 +139,10 @@ export const useGameAudio = () => {
 
     // Farm background music - plays MP3 file
     const farmAudioRef = useRef<HTMLAudioElement | null>(null);
+    const farmMusicStartedRef = useRef(false);
 
     const startFarmMusic = useCallback(() => {
-        if (isMutedRef.current) return;
+        if (isMutedRef.current || farmMusicStartedRef.current) return;
 
         // Create audio element if not exists
         if (!farmAudioRef.current) {
@@ -150,9 +151,29 @@ export const useGameAudio = () => {
             farmAudioRef.current.volume = masterVolumeRef.current * 0.3;
         }
 
-        farmAudioRef.current.play().catch((err) => {
-            console.log('Farm music play failed:', err);
-        });
+        // 尝试播放，如果失败（iPad 自动播放限制），等待用户交互
+        const tryPlay = () => {
+            if (farmAudioRef.current && !farmMusicStartedRef.current) {
+                farmAudioRef.current.play()
+                    .then(() => {
+                        farmMusicStartedRef.current = true;
+                        // 移除事件监听
+                        document.removeEventListener('click', tryPlay);
+                        document.removeEventListener('touchstart', tryPlay);
+                    })
+                    .catch(() => {
+                        // 播放失败，等待用户交互
+                    });
+            }
+        };
+
+        tryPlay();
+
+        // 如果自动播放失败，监听用户交互
+        if (!farmMusicStartedRef.current) {
+            document.addEventListener('click', tryPlay, { once: true });
+            document.addEventListener('touchstart', tryPlay, { once: true });
+        }
     }, []);
 
     const stopFarmMusic = useCallback(() => {
@@ -160,6 +181,9 @@ export const useGameAudio = () => {
             farmAudioRef.current.pause();
             farmAudioRef.current.currentTime = 0;
         }
+        farmMusicStartedRef.current = false;
+        document.removeEventListener('click', () => {});
+        document.removeEventListener('touchstart', () => {});
     }, []);
 
     const playCatchSuccessSound = useCallback(() => {
